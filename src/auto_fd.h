@@ -10,6 +10,10 @@ public:
         this->m_fd = fd;
     }
 
+    int get_fd() {
+        return this->m_fd;
+    }
+
     ~AutoFD() {
         if (0 <= m_fd) {
             close(m_fd);
