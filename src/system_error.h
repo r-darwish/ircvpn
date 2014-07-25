@@ -32,4 +32,13 @@ private:
     format m_format;
 };
 
+static int inline system_call(int result, const char * error_message)
+{
+    if (-1 == result) {
+        throw SystemError(errno, error_message);
+    }
+
+    return result;
+}
+
 #endif
