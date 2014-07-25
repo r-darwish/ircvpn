@@ -24,6 +24,14 @@ static void install_sighandler(int signum, sighandler_t handler)
     }
 }
 
+static void drop_privileges(uid_t uid, gid_t gid) {
+    if (getuid() == 0) {
+        BOOST_LOG_TRIVIAL(info) << "Dropping root privileges";
+        system_call(setgid(gid), "Unable to set gid");
+        system_call(setuid(uid), "Unable to set uid");
+    }
+}
+
 int main()
 {
     BOOST_LOG_TRIVIAL(info) << "Application started";
@@ -35,6 +43,7 @@ int main()
 
         TunDevice tun("10.0.0.1", "10.0.0.2");
         int tun_fd = tun.get_fd();
+        drop_privileges(1000, 1000);
 
         while (g_continue) {
             char buffer[4096] = {0};
