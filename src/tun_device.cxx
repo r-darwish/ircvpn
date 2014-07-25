@@ -6,7 +6,6 @@
 #include <linux/if_tun.h>
 #include <arpa/inet.h>
 #include <errno.h>
-#include <stdio.h>
 #include "tun_device.h"
 #include "system_error.h"
 #include "auto_fd.h"

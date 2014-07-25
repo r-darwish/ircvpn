@@ -2,6 +2,7 @@
 #include <exception>
 #include <signal.h>
 #include <errno.h>
+#include <boost/log/trivial.hpp>
 #include "tun_device.h"
 #include "system_error.h"
 
@@ -11,7 +12,6 @@ static bool g_continue = true;
 
 static void sig_handler(int signum)
 {
-    printf("Caught signal %d\n", signum);
     g_continue = false;
 }
 
@@ -26,6 +26,8 @@ static void install_sighandler(int signum, sighandler_t handler)
 
 int main()
 {
+    BOOST_LOG_TRIVIAL(info) << "Application started";
+
     try {
         install_sighandler(SIGTERM, sig_handler);
         install_sighandler(SIGQUIT, sig_handler);
@@ -40,15 +42,15 @@ int main()
             if (-1 == read_bytes) {
                 throw SystemError(errno, "Unable to read from the tunnel");
             }
-            printf("Read %d\n", read_bytes);
+            BOOST_LOG_TRIVIAL(debug) << "Read " << read_bytes << " bytes from the tunnel";
         }
     } catch (SystemError & e) {
         if (EINTR == e.m_errno) {
-            printf("Exiting due to signal\n");
+            BOOST_LOG_TRIVIAL(info) << "Exiting due to a signal";
         } else {
-            printf("Critical Exception: %s\n", e.what());
+            BOOST_LOG_TRIVIAL(fatal) << "System Error: " << e.what();
         }
     } catch (exception & e) {
-        printf("Critical Exception: %s\n", e.what());
+        BOOST_LOG_TRIVIAL(fatal) << "System Error: " << e.what();
     }
 }
