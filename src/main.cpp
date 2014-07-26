@@ -3,8 +3,8 @@
 #include <signal.h>
 #include <errno.h>
 #include <boost/log/trivial.hpp>
-#include "tun_device.h"
-#include "system_error.h"
+#include "tun_device.hpp"
+#include "system_error.hpp"
 
 using namespace std;
 

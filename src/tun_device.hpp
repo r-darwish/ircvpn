@@ -1,7 +1,7 @@
 #ifndef __TUN_DEVICE_H__
 #define __TUN_DEVICE_H__
 
-#include "auto_fd.h"
+#include "auto_fd.hpp"
 
 class tun_device
 {

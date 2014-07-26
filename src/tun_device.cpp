@@ -6,9 +6,9 @@
 #include <linux/if_tun.h>
 #include <arpa/inet.h>
 #include <errno.h>
-#include "tun_device.h"
-#include "system_error.h"
-#include "auto_fd.h"
+#include "tun_device.hpp"
+#include "system_error.hpp"
+#include "auto_fd.hpp"
 
 tun_device::tun_device(const char * src_ip, const char * dest_ip) :
     tun(system_call(open("/dev/net/tun", O_RDWR), "Unable to open the tunnel device"))
