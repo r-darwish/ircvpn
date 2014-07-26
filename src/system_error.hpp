@@ -2,6 +2,7 @@
 #define __SYSTEM_ERROR_H__
 
 #include <string.h>
+#include <errno.h>
 #include <exception>
 #include <boost/format.hpp>
 
@@ -16,7 +17,7 @@ public:
         message(message),
         format_msg("%1%: %2% (%3%)")
     {
-        format_msg % message % strerror(errno) % errno;
+        format_msg % message % strerror(err) % err;
     }
 
     const char * what() const throw(){

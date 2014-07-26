@@ -4,4 +4,4 @@ find_package(Threads)
 add_definitions(-Wall -Wconversion)
 
 target_link_libraries(ircvpn ${Boost_LOG_LIBRARY} ${CMAKE_THREAD_LIBS_INIT})
-add_executable (ircvpn main.cpp tun_device.cpp)
+add_executable (ircvpn main.cpp irc_vpn.cpp tun_device.cpp)
