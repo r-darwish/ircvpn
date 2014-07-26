@@ -20,6 +20,7 @@ public:
     }
 
 private:
+    auto_fd(const auto_fd & other);
     int fd;
 };
 

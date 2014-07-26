@@ -27,7 +27,7 @@ tun_device::tun_device(const char * src_ip, const char * dest_ip) :
     memset(&addr, 0, sizeof(addr));
     addr.sin_family = AF_INET;
 
-    auto_fd sock = auto_fd(
+    auto_fd sock(
         system_call(
             socket(AF_INET, SOCK_DGRAM, 0),
             "Unable to create a socket for the tunnel device"));

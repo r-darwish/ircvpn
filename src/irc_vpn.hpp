@@ -9,8 +9,8 @@ static const int TUN_READ_BUFFER_SIZE = 4096;
 class irc_vpn
 {
 public:
-    irc_vpn(tun_device * tun) :
-        tun_sd(io, tun->get_fd())
+    irc_vpn(tun_device & tun) :
+        tun_sd(io, tun.get_fd())
     { }
 
     void run();

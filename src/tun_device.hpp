@@ -10,6 +10,7 @@ public:
     inline int get_fd() const { return this->tun.get_fd(); }
 
 private:
+    tun_device(const tun_device & other);
     auto_fd tun;
 };
 

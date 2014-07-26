@@ -22,7 +22,7 @@ int main()
         tun_device tun("10.0.0.1", "10.0.0.2");
         drop_privileges(1000, 1000);
 
-        irc_vpn app(&tun);
+        irc_vpn app(tun);
         app.run();
 
     } catch (system_error & e) {
