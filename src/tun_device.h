@@ -1,19 +1,16 @@
 #ifndef __TUN_DEVICE_H__
 #define __TUN_DEVICE_H__
 
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <linux/if.h>
 #include "auto_fd.h"
 
-class TunDevice
+class tun_device
 {
 public:
-    TunDevice(const char * src_ip, const char * dest_ip);
-    int get_fd() { return this->m_fd.get_fd(); }
+    tun_device(const char * src_ip, const char * dest_ip);
+    inline int get_fd() const { return this->tun.get_fd(); }
 
 private:
-    AutoFD m_fd;
+    auto_fd tun;
 };
 
 #endif

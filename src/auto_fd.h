@@ -5,26 +5,22 @@
 #include <unistd.h>
 #include <boost/log/trivial.hpp>
 
-class AutoFD
+class auto_fd
 {
 public:
-    AutoFD(int fd) {
-        this->m_fd = fd;
-    }
+    auto_fd(int fd) : fd(fd) { }
 
-    int get_fd() {
-        return this->m_fd;
-    }
+    inline int get_fd() const { return this->fd; }
 
-    ~AutoFD() {
-        if (0 <= m_fd) {
-            BOOST_LOG_TRIVIAL(debug) << "Closing " << m_fd;
-            close(m_fd);
+    ~auto_fd() {
+        if (0 <= fd) {
+            BOOST_LOG_TRIVIAL(debug) << "Closing " << fd;
+            close(fd);
         }
     }
 
 private:
-    int m_fd;
+    int fd;
 };
 
 #endif

@@ -20,7 +20,7 @@ static void install_sighandler(int signum, sighandler_t handler)
     struct sigaction int_handler = {0};
     int_handler.sa_handler = handler;
     if (-1 == sigaction(signum, &int_handler, 0)) {
-        throw SystemError(errno, "Unable to set a signal");
+        throw system_error(errno, "Unable to set a signal");
     }
 }
 
@@ -41,7 +41,7 @@ int main()
         install_sighandler(SIGQUIT, sig_handler);
         install_sighandler(SIGINT, sig_handler);
 
-        TunDevice tun("10.0.0.1", "10.0.0.2");
+        tun_device tun("10.0.0.1", "10.0.0.2");
         int tun_fd = tun.get_fd();
         drop_privileges(1000, 1000);
 
@@ -49,12 +49,12 @@ int main()
             char buffer[4096] = {0};
             ssize_t read_bytes = read(tun_fd, buffer, sizeof(buffer));
             if (-1 == read_bytes) {
-                throw SystemError(errno, "Unable to read from the tunnel");
+                throw system_error(errno, "Unable to read from the tunnel");
             }
             BOOST_LOG_TRIVIAL(debug) << "Read " << read_bytes << " bytes from the tunnel";
         }
-    } catch (SystemError & e) {
-        if (EINTR == e.m_errno) {
+    } catch (system_error & e) {
+        if (EINTR == e.get_error_code()) {
             BOOST_LOG_TRIVIAL(info) << "Exiting due to a signal";
         } else {
             BOOST_LOG_TRIVIAL(fatal) << "System Error: " << e.what();

@@ -10,14 +10,14 @@
 #include "system_error.h"
 #include "auto_fd.h"
 
-TunDevice::TunDevice(const char * src_ip, const char * dest_ip) :
-    m_fd(system_call(open("/dev/net/tun", O_RDWR), "Unable to open the tunnel device"))
+tun_device::tun_device(const char * src_ip, const char * dest_ip) :
+    tun(system_call(open("/dev/net/tun", O_RDWR), "Unable to open the tunnel device"))
 {
     struct ifreq ifr;
     memset(&ifr, 0, sizeof(ifr));
     ifr.ifr_flags = IFF_TUN | IFF_NO_PI;
 
-    int fd = m_fd.get_fd();
+    int fd = tun.get_fd();
     system_call(
         ioctl(fd, TUNSETIFF, static_cast<void *>(&ifr)),
         "Unable to create the tunnel device");
@@ -27,7 +27,7 @@ TunDevice::TunDevice(const char * src_ip, const char * dest_ip) :
     memset(&addr, 0, sizeof(addr));
     addr.sin_family = AF_INET;
 
-    AutoFD sock = AutoFD(
+    auto_fd sock = auto_fd(
         system_call(
             socket(AF_INET, SOCK_DGRAM, 0),
             "Unable to create a socket for the tunnel device"));

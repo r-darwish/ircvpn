@@ -4,38 +4,39 @@
 #include <string.h>
 #include <exception>
 #include <boost/format.hpp>
+
 using namespace std;
 using boost::format;
 
-class SystemError : public exception
+class system_error : public exception
 {
 public:
-    int m_errno;
-    const char * m_message;
-
-    SystemError(int err, const char * message) :
-            m_format("%1%: %2% (%3%)") {
-        m_format % message % strerror(errno) % errno;
-        m_errno = err;
-        this->m_message = message;
+    system_error(int err, const char * message) :
+        error_code(err),
+        message(message),
+        format_msg("%1%: %2% (%3%)")
+    {
+        format_msg % message % strerror(errno) % errno;
     }
 
     const char * what() const throw(){
-        return m_format.str().c_str();
+        return format_msg.str().c_str();
     }
 
-    ~SystemError()  throw() {
+    inline int get_error_code() const { return error_code; }
 
-    }
+    ~system_error() throw() { }
 
 private:
-    format m_format;
+    int error_code;
+    const char * message;
+    format format_msg;
 };
 
 static int inline system_call(int result, const char * error_message)
 {
     if (-1 == result) {
-        throw SystemError(errno, error_message);
+        throw system_error(errno, error_message);
     }
 
     return result;
