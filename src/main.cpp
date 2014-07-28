@@ -6,6 +6,15 @@
 
 using namespace std;
 
+enum ARGS
+{
+    ARG_PROGRAM,
+    ARG_SERVER,
+    ARG_NICKNAME,
+
+    ARG_COUNT
+};
+
 static void drop_privileges(uid_t uid, gid_t gid) {
     if (getuid() == 0) {
         BOOST_LOG_TRIVIAL(info) << "Dropping root privileges";
@@ -14,15 +23,20 @@ static void drop_privileges(uid_t uid, gid_t gid) {
     }
 }
 
-int main()
+int main(int argc, const char ** const argv)
 {
+    if (ARG_COUNT != argc) {
+        cerr << "Usage: ircvpn [server] [nickname]" << endl;
+        return 1;
+    }
+
     BOOST_LOG_TRIVIAL(info) << "Application started";
 
     try {
         tun_device tun("10.0.0.1", "10.0.0.2");
         drop_privileges(1000, 1000);
 
-        irc_vpn app(tun);
+        irc_vpn app(tun, argv[ARG_SERVER], argv[ARG_NICKNAME]);
         app.run();
 
     } catch (system_error & e) {

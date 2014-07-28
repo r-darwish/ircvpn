@@ -10,8 +10,8 @@ static const int TUN_READ_BUFFER_SIZE = 4096;
 class irc_vpn
 {
 public:
-    irc_vpn(tun_device & tun) :
-        irc(io, "irc.dal.net", "alice-ircvpn"),
+    irc_vpn(tun_device & tun, std::string server, std::string nickname) :
+        irc(io, server, nickname),
         tun_sd(io, tun.get_fd())
     { }
 
