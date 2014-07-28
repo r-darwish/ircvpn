@@ -42,5 +42,6 @@ void irc_vpn::run()
         buffer(tun_read_buffer, sizeof(tun_read_buffer)),
         boost::bind(&irc_vpn::on_tun_read, this, _1, _2));
 
+    irc.connect();
     io.run();
 }

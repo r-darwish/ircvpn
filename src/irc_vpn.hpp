@@ -3,6 +3,7 @@
 
 #include <boost/asio.hpp>
 #include "tun_device.hpp"
+#include "irc_client.hpp"
 
 static const int TUN_READ_BUFFER_SIZE = 4096;
 
@@ -10,12 +11,14 @@ class irc_vpn
 {
 public:
     irc_vpn(tun_device & tun) :
+        irc(io, "irc.dal.net", "alice-ircvpn"),
         tun_sd(io, tun.get_fd())
     { }
 
     void run();
 private:
     boost::asio::io_service io;
+    irc_client irc;
     boost::asio::posix::stream_descriptor tun_sd;
     char tun_read_buffer[TUN_READ_BUFFER_SIZE];
     void on_tun_read(
