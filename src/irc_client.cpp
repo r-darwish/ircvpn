@@ -9,6 +9,15 @@ using namespace boost::asio;
 
 static const std::string NICK_MESSAGE("NOTICE AUTH :*** Looking up your hostname");
 
+void irc_client::send_private_message(
+    const std::string & to, const std::string message)
+{
+    std::ostringstream answer;
+    answer << "PRIVMSG " << to << " :" << message << "\r\n";
+    answer << "USER " << nickname << " one two three :four\r\n";
+    send_data(answer);
+}
+
 void irc_client::write_handler(
     const boost::system::error_code & error,
     std::size_t bytes_written)
@@ -55,18 +64,35 @@ void irc_client::handle_ping(const std::string & message)
     send_data(answer);
 }
 
+void irc_client::handle_private_message(const std::string & message)
+{
+    std::istringstream iss(message);
+    std::string entity, command;
+
+    iss >> entity >> command;
+
+    if ("PRIVMSG" == command) {
+        std::string to, message_text;
+        iss >> to;
+        getline(iss, message_text);
+        message_text.erase(0, 2);
+
+        size_t sep(entity.find('!'));
+        std::string from;
+        if (std::string::npos != sep) {
+            from = entity.substr(1, sep - 1);
+        } else {
+            from = entity.substr(1, std::string::npos);
+        }
+
+        on_private_message(from, message_text);
+    }
+}
+
 void irc_client::handle_message(const std::string & message)
 {
     if (':' == message[0]) {
-        size_t sep_pos(message.find(' ', 0));
-        if (std::string::npos == sep_pos) {
-            BOOST_LOG_TRIVIAL(error) << "Invalid server message: " << message;
-            return;
-        }
-
-        std::string server_message = message.substr(
-            sep_pos + 1);
-        handle_server_message(server_message);
+        handle_private_message(message);
     } else if (boost::starts_with(message, "NOTICE")) {
         handle_server_message(message);
     } else if (boost::starts_with(message, "PING")) {
