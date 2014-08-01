@@ -37,7 +37,6 @@ private:
         std::size_t bytes_written);
     void send_data(const std::ostringstream & message);
     void handle_private_message(const std::string & message);
-    void handle_server_message(const std::string & message);
     void handle_ping(const std::string & message);
     void handle_message(const std::string & message);
     void on_line_read(

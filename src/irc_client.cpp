@@ -40,16 +40,6 @@ void irc_client::send_data(const std::ostringstream & message_stream)
         boost::bind(&irc_client::write_handler, this, _1, _2));
 }
 
-void irc_client::handle_server_message(const std::string & message)
-{
-    if (std::string::npos != message.find(NICK_MESSAGE)) {
-        std::ostringstream answer;
-        answer << "NICK " << nickname << "\r\n";
-        answer << "USER " << nickname << " one two three :four\r\n";
-        send_data(answer);
-    }
-}
-
 void irc_client::handle_ping(const std::string & message)
 {
     size_t sep_pos(message.find(':', 0));
@@ -93,8 +83,6 @@ void irc_client::handle_message(const std::string & message)
 {
     if (':' == message[0]) {
         handle_private_message(message);
-    } else if (boost::starts_with(message, "NOTICE")) {
-        handle_server_message(message);
     } else if (boost::starts_with(message, "PING")) {
         handle_ping(message);
     }
@@ -130,6 +118,11 @@ void irc_client::connect()
     BOOST_LOG_TRIVIAL(info) << "Connecting to " << server;
     boost::asio::connect(irc_socket, endpoint_iterator);
     BOOST_LOG_TRIVIAL(info) << "Connected";
+
+    std::ostringstream answer;
+    answer << "NICK " << nickname << "\r\n";
+    answer << "USER " << nickname << " one two three :four\r\n";
+    send_data(answer);
 
     async_read_until(
         irc_socket,
