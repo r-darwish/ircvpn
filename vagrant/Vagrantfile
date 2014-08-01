@@ -9,5 +9,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.synced_folder "../", "/ircvpn"
 
   config.vm.provision "shell",
-      inline: "apt-get update && apt-get -qqy install cmake build-essential libasio-dev libboost-log-dev ntp"
+      inline: "apt-get update && apt-get -qqy install cmake build-essential libasio-dev libboost-log-dev libb64-dev ntp gdb tshark && apt-get -qqy purge puppet puppet-common chef chef-zero && apt-get -qqy autoremove"
+
+  config.vm.define :alice, primary: true do |alice|
+    alice.vm.hostname = 'alice'
+  end
+
+  config.vm.define :bob do |bob|
+    bob.vm.hostname = 'bob'
+  end
 end
