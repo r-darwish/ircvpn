@@ -2,6 +2,7 @@
 #define __IRC_CLIENT_H__
 
 #include <boost/signals2.hpp>
+#include <boost/asio.hpp>
 
 class irc_client
 {
@@ -11,6 +12,7 @@ public:
         const std::string & server,
         const std::string & nickname) :
         usable(false),
+        reconnect_timer(io),
         io(io),
         irc_socket(io),
         server(server),
@@ -28,6 +30,7 @@ public:
 
 private:
     bool usable;
+    boost::asio::deadline_timer reconnect_timer;
     irc_client(const irc_client & other);
     boost::asio::io_service & io;
     boost::asio::ip::tcp::socket irc_socket;
@@ -41,6 +44,9 @@ private:
     void handle_private_message(const std::string & message);
     void handle_ping(const std::string & message);
     void handle_message(const std::string & message);
+    void reconnect();
+    void reconnect_handler(
+        boost::system::error_code error);
     void on_line_read(
         boost::system::error_code error);
 };
