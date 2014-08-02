@@ -52,6 +52,11 @@ tun_device::tun_device(const char * src_ip, const char * dest_ip) :
         ioctl(s, SIOCSIFDSTADDR, (caddr_t)(&ifr)),
         "Unable to set the IP address for the tun device");
 
+    ifr.ifr_mtu = 333;
+    system_call(
+        ioctl(s, SIOCSIFMTU, (caddr_t)(&ifr)),
+        "Unable to set the MTU address for the tun device");
+
     ifr.ifr_flags |= IFF_UP;
     system_call(
         ioctl(s, SIOCSIFFLAGS, (caddr_t)(&ifr)),
