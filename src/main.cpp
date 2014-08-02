@@ -10,7 +10,10 @@ enum ARGS
 {
     ARG_PROGRAM,
     ARG_SERVER,
-    ARG_NICKNAME,
+    ARG_SRC_NICKNAME,
+    ARG_SRC_ADDRESS,
+    ARG_DST_NICKNAME,
+    ARG_DST_ADDRESS,
 
     ARG_COUNT
 };
@@ -26,17 +29,17 @@ static void drop_privileges(uid_t uid, gid_t gid) {
 int main(int argc, const char ** const argv)
 {
     if (ARG_COUNT != argc) {
-        cerr << "Usage: ircvpn [server] [nickname]" << endl;
+        cerr << "Usage: ircvpn [server] [source nickname] [source ip] [dest nickname] [dest ip]" << endl;
         return 1;
     }
 
     BOOST_LOG_TRIVIAL(info) << "Application started";
 
     try {
-        tun_device tun("10.0.0.1", "10.0.0.2");
+        tun_device tun(argv[ARG_SRC_ADDRESS], argv[ARG_DST_ADDRESS]);
         drop_privileges(1000, 1000);
 
-        irc_vpn app(tun, argv[ARG_SERVER], argv[ARG_NICKNAME]);
+        irc_vpn app(tun, argv[ARG_SERVER], argv[ARG_SRC_NICKNAME]);
         app.run();
 
     } catch (system_error & e) {
