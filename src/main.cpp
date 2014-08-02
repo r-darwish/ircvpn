@@ -39,7 +39,7 @@ int main(int argc, const char ** const argv)
         tun_device tun(argv[ARG_SRC_ADDRESS], argv[ARG_DST_ADDRESS]);
         drop_privileges(1000, 1000);
 
-        irc_vpn app(tun, argv[ARG_SERVER], argv[ARG_SRC_NICKNAME]);
+        irc_vpn app(tun, argv[ARG_SERVER], argv[ARG_SRC_NICKNAME], argv[ARG_DST_NICKNAME]);
         app.run();
 
     } catch (system_error & e) {
