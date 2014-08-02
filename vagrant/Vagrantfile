@@ -8,14 +8,22 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.synced_folder "../", "/ircvpn"
 
-  config.vm.provision "shell",
-      inline: "apt-get update && apt-get -qqy install cmake build-essential libasio-dev libboost-log-dev libb64-dev ntp gdb tshark && apt-get -qqy purge puppet puppet-common chef chef-zero && apt-get -qqy autoremove"
 
   config.vm.define :alice, primary: true do |alice|
     alice.vm.hostname = 'alice'
+    alice.vm.provision "shell",
+          inline: "apt-get update && apt-get -qqy install cmake build-essential libasio-dev libboost-log-dev libb64-dev ntp gdb tshark && apt-get -qqy purge puppet puppet-common chef chef-zero && apt-get -qqy autoremove"
+    alice.vm.provider "virtualbox" do |v|
+      v.memory = 1024
+    end
   end
 
   config.vm.define :bob do |bob|
     bob.vm.hostname = 'bob'
+    bob.vm.provision "shell",
+          inline: "apt-get update && apt-get -qqy install libboost-log1.54.0 libboost-system1.54.0 libb64-0d ntp tshark && apt-get -qqy purge puppet puppet-common chef chef-zero && apt-get -qqy autoremove"
+    bob.vm.provider "virtualbox" do |v|
+      v.memory = 256
+    end
   end
 end
