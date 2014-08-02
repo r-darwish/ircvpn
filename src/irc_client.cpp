@@ -14,7 +14,6 @@ void irc_client::send_private_message(
 {
     std::ostringstream answer;
     answer << "PRIVMSG " << to << " :" << message << "\r\n";
-    answer << "USER " << nickname << " one two three :four\r\n";
     send_data(answer);
 }
 
