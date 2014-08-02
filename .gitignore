@@ -19,3 +19,4 @@ install_manifest.txt
 *.out
 *.app
 ircvpn
+.vagrant
