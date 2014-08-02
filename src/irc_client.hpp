@@ -10,6 +10,7 @@ public:
         boost::asio::io_service & io,
         const std::string & server,
         const std::string & nickname) :
+        usable(false),
         io(io),
         irc_socket(io),
         server(server),
@@ -26,6 +27,7 @@ public:
 
 
 private:
+    bool usable;
     irc_client(const irc_client & other);
     boost::asio::io_service & io;
     boost::asio::ip::tcp::socket irc_socket;

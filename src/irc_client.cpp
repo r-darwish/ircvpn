@@ -12,6 +12,10 @@ static const std::string NICK_MESSAGE("NOTICE AUTH :*** Looking up your hostname
 void irc_client::send_private_message(
     const std::string & to, const std::string message)
 {
+    if (!usable) {
+        return;
+    }
+
     std::ostringstream answer;
     answer << "PRIVMSG " << to << " :" << message << "\r\n";
     send_data(answer);
@@ -23,6 +27,7 @@ void irc_client::write_handler(
 {
     if (error) {
         BOOST_LOG_TRIVIAL(error) << "IRC Write Error: " << error.message();
+        usable = false;
         connect();
         return;
     }
@@ -75,6 +80,13 @@ void irc_client::handle_private_message(const std::string & message)
         }
 
         on_private_message(from, message_text);
+    } else if ("MODE" == command) {
+        std::string nick, mode;
+        iss >> nick >> mode;
+        if ((nick == nickname) && ("+i" == mode)) {
+            BOOST_LOG_TRIVIAL(debug) << "Connected";
+            usable = true;
+        }
     }
 }
 
