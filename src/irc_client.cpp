@@ -1,6 +1,7 @@
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/log/trivial.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include "irc_client.hpp"
 
@@ -8,13 +9,27 @@ using boost::asio::ip::tcp;
 using namespace boost::asio;
 
 static const std::string NICK_MESSAGE("NOTICE AUTH :*** Looking up your hostname");
+static const int RECONNECT_WAIT(10);
 
 void irc_client::send_private_message(
     const std::string & to, const std::string message)
 {
+    if (!usable) {
+        return;
+    }
+
     std::ostringstream answer;
     answer << "PRIVMSG " << to << " :" << message << "\r\n";
     send_data(answer);
+}
+
+void irc_client::reconnect()
+{
+    usable = false;
+    reconnect_timer.expires_from_now(
+        boost::posix_time::seconds(RECONNECT_WAIT));
+    reconnect_timer.async_wait(
+        boost::bind(&irc_client::reconnect_handler, this, _1));
 }
 
 void irc_client::write_handler(
@@ -23,7 +38,7 @@ void irc_client::write_handler(
 {
     if (error) {
         BOOST_LOG_TRIVIAL(error) << "IRC Write Error: " << error.message();
-        connect();
+        reconnect();
         return;
     }
 
@@ -75,6 +90,13 @@ void irc_client::handle_private_message(const std::string & message)
         }
 
         on_private_message(from, message_text);
+    } else if ("MODE" == command) {
+        std::string nick, mode;
+        iss >> nick >> mode;
+        if ((nick == nickname) && ("+i" == mode)) {
+            BOOST_LOG_TRIVIAL(debug) << "Connected";
+            usable = true;
+        }
     }
 }
 
@@ -87,12 +109,24 @@ void irc_client::handle_message(const std::string & message)
     }
 }
 
+void irc_client::reconnect_handler(
+    boost::system::error_code error)
+{
+    if (error) {
+        BOOST_LOG_TRIVIAL(error) << "Timer error: " << error.message();
+        return;
+    }
+
+    BOOST_LOG_TRIVIAL(debug) << "Reconnecting";
+    connect();
+}
+
 void irc_client::on_line_read(
     boost::system::error_code error)
 {
     if (error) {
         BOOST_LOG_TRIVIAL(error) << "IRC Read Error: " << error.message();
-        connect();
+        reconnect();
         return;
     }
 
